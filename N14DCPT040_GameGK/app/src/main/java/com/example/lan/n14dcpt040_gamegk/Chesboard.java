@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class Chesboard {
     private int colQty = 8;
     private int rowQty = 8;
     private Bitmap tick;
-    private int winer = 1;
+    private int winner = 1;
     private Bitmap cross;
 
 
@@ -207,85 +208,6 @@ public class Chesboard {
         return false;
     }
 
-    private boolean checkWin(int player) {
-        int rowIndex = 0;
-        int colIndex = 0;
-        //dọc
-        int dem = 0;
-        do{
-            dem++;
-            rowIndex++;
-        }while (rowIndex < rowQty && board[rowIndex][colIndex] == player);
-        rowIndex = rowIndex-1;
-        while (rowIndex>=0 && board[rowIndex][colIndex] == player){
-            dem++;
-            rowIndex--;
-        }
-        if(dem == 1){
-            winer = player;
-            return true;
-        }
-//ngang
-
-        dem= 0;
-        do {
-            dem++;
-            colIndex++;
-        } while (colIndex < colQty && board[rowIndex][colIndex] == player);
-        colIndex = colIndex - 1;
-        while (colIndex >= 0 && board[rowIndex][colIndex] == player) {
-            dem++;
-            colIndex--;
-        }
-        if (dem == 1) {
-            winer = player;
-            return true;
-        }
-//chéo
-
-        dem = 0;
-
-        do {
-            dem++;
-           rowIndex++;
-            colIndex++;
-        } while (colIndex < colQty && rowIndex < rowQty && board[rowIndex][colIndex] == player);
-        rowIndex = rowIndex - 1;
-        colIndex = colIndex - 1;
-        while (colIndex >= 0 && rowIndex >= 0 && board[rowIndex][colIndex] == player) {
-            dem++;
-            colIndex--;
-            rowIndex--;
-        }
-        if (dem == 1) {
-            winer = player;
-            return true;
-        }
-
-//chéo t2
-        dem = 0;
-
-
-        do {
-            dem++;
-            rowIndex--;
-            colIndex++;
-        } while (colIndex < colQty && rowIndex >= 0 && board[rowIndex][colIndex] == player);
-        rowIndex = rowIndex + 1;
-        colIndex = colIndex - 1;
-        while (colIndex >= 0 && rowIndex < rowQty && board[rowIndex][colIndex] == player) {
-            dem++;
-            colIndex--;
-            rowIndex++;
-        }
-        if (dem == 1) {
-            winer = player;
-            return true;
-        }
-
-        return false;
-
-    }
 
     public int getCurrentDept() {
         int count = 0;
@@ -314,7 +236,100 @@ public class Chesboard {
         player = (player + 1) % 2;
 
     }
+    public boolean ktwin(int player, int rowIndex, int colIndex) {
+        int i, j, count;
 
+        // check đường dọc
+        count = 0;
+        i = rowIndex;
+        do {
+            count++;
+            i++;
+        } while (i < rowQty && board[i][colIndex] == player);
+        i = rowIndex - 1;
+        while (i >= 0 && board[i][colIndex] == player) {
+            count++;
+            i--;
+        }
+        if (count == 5) {
+            winner = player;
+            return true;
+        }
+
+        // check đường ngang
+        count = 0;
+        j = colIndex;
+        do {
+            count++;
+            j++;
+        } while (j < colQty && board[rowIndex][j] == player);
+        j = colIndex - 1;
+        while (j >= 0 && board[rowIndex][j] == player) {
+            count++;
+            j--;
+        }
+        if (count == 5) {
+            winner = player;
+            return true;
+        }
+
+        // check đường chéo 1 \
+        count = 0;
+        i = rowIndex;
+        j = colIndex;
+        do {
+            count++;
+            i++;
+            j++;
+        } while (j < colQty && i < rowQty && board[i][j] == player);
+        i = rowIndex - 1;
+        j = colIndex - 1;
+        while (j >= 0 && i >= 0 && board[i][j] == player) {
+            count++;
+            j--;
+            i--;
+        }
+        if (count ==5) {
+            winner = player;
+            return true;
+        }
+
+        // check đường chéo 2 /
+        count = 0;
+        i = rowIndex;
+        j = colIndex;
+        do {
+            count++;
+            i--;
+            j++;
+        } while (j < colQty && i >= 0 && board[i][j] == player);
+        i = rowIndex + 1;
+        j = colIndex - 1;
+        while (j >= 0 && i < rowQty && board[i][j] == player) {
+            count++;
+            j--;
+            i++;
+        }
+        if (count == 5) {
+            winner = player;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkWin(int player){
+        for(int i = 0; i< rowQty; i++){
+            for(int j = 0; j < colQty; j++){
+               if(ktwin(player,i,j)){
+                   Log.d("Win",String.valueOf(player));
+                   return true;
+               }
+            }
+        }
+
+        return false;
+    }
 
     public int Evaluate(int player) {
         if (checkWin(player))
